@@ -2,8 +2,8 @@ const gameContainer = document.getElementById('gameContainer');
 const dot = document.getElementById('dot');
 let dotY = gameContainer.clientHeight / 2;
 let dotVelocity = 0;
-const gravity = 0.6;
-const lift = -15;
+const gravity = 0.3;  // Reduced gravity
+const lift = -10;    // Reduced lift
 
 let gameOver = false;
 
@@ -24,7 +24,7 @@ let pipes = [];
 let frame = 0;
 
 function createPipe() {
-    const pipeGap = 150;
+    const pipeGap = 200;  // Increased pipe gap
     const pipeHeight = Math.random() * (gameContainer.clientHeight - pipeGap);
 
     const topPipe = document.createElement('div');
@@ -65,12 +65,12 @@ function update() {
     dot.style.top = `${dotY}px`;
 
     // Move and manage pipes
-    if (frame % 90 === 0) {
+    if (frame % 120 === 0) {  // Increase the interval to create pipes less frequently
         createPipe();
     }
 
     for (let i = 0; i < pipes.length; i++) {
-        pipes[i].x -= 2;
+        pipes[i].x -= 1.5;  // Reduced pipe speed
         pipes[i].topPipe.style.left = `${pipes[i].x}px`;
         pipes[i].bottomPipe.style.left = `${pipes[i].x}px`;
 
