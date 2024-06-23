@@ -1,92 +1,136 @@
-const gameContainer = document.getElementById('gameContainer');
-const dot = document.getElementById('dot');
-let dotY = gameContainer.clientHeight / 2;
-let dotVelocity = 0;
-const gravity = 0.6;
-const lift = -15;
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dot Avoiding Pipes</title>
+    <style>
+        #gameContainer {
+            position: relative;
+            width: 800px;
+            height: 600px;
+            background-color: lightblue;
+            overflow: hidden;
+            margin: 0 auto;
+        }
+        #dot {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background-color: red;
+            top: 50%;
+            left: 50px;
+        }
+        .pipe {
+            position: absolute;
+            width: 50px;
+            background-color: green;
+        }
+    </style>
+</head>
+<body>
+    <div id="gameContainer">
+        <div id="dot"></div>
+    </div>
 
-document.addEventListener('keydown', (e) => {
-    if (e.code === 'Space') {
-        dotVelocity = lift;
-    }
-});
+    <script>
+        const gameContainer = document.getElementById('gameContainer');
+        const dot = document.getElementById('dot');
+        let dotY = gameContainer.clientHeight / 2;
+        let dotVelocity = 0;
+        const gravity = 0.6;
+        const lift = -15;
 
-let pipes = [];
-let frame = 0;
+        document.addEventListener('keydown', (e) => {
+            if (e.code === 'Space') {
+                dotVelocity = lift;
+            }
+        });
 
-function createPipe() {
-    const pipeGap = 150;
-    const pipeHeight = Math.random() * (gameContainer.clientHeight - pipeGap);
+        // Add touch event listener
+        document.addEventListener('touchstart', () => {
+            dotVelocity = lift;
+        });
 
-    const topPipe = document.createElement('div');
-    topPipe.className = 'pipe';
-    topPipe.style.height = `${pipeHeight}px`;
-    topPipe.style.top = '0';
-    topPipe.style.left = '800px';
+        let pipes = [];
+        let frame = 0;
 
-    const bottomPipe = document.createElement('div');
-    bottomPipe.className = 'pipe';
-    bottomPipe.style.height = `${gameContainer.clientHeight - pipeHeight - pipeGap}px`;
-    bottomPipe.style.bottom = '0';
-    bottomPipe.style.left = '800px';
+        function createPipe() {
+            const pipeGap = 150;
+            const pipeHeight = Math.random() * (gameContainer.clientHeight - pipeGap);
 
-    gameContainer.appendChild(topPipe);
-    gameContainer.appendChild(bottomPipe);
+            const topPipe = document.createElement('div');
+            topPipe.className = 'pipe';
+            topPipe.style.height = `${pipeHeight}px`;
+            topPipe.style.top = '0';
+            topPipe.style.left = '800px';
 
-    pipes.push({ topPipe, bottomPipe, x: 800 });
-}
+            const bottomPipe = document.createElement('div');
+            bottomPipe.className = 'pipe';
+            bottomPipe.style.height = `${gameContainer.clientHeight - pipeHeight - pipeGap}px`;
+            bottomPipe.style.bottom = '0';
+            bottomPipe.style.left = '800px';
 
-function update() {
-    frame++;
+            gameContainer.appendChild(topPipe);
+            gameContainer.appendChild(bottomPipe);
 
-    // Move the dot
-    dotVelocity += gravity;
-    dotY += dotVelocity;
-
-    if (dotY > gameContainer.clientHeight - 20) {
-        dotY = gameContainer.clientHeight - 20;
-        dotVelocity = 0;
-    } else if (dotY < 0) {
-        dotY = 0;
-        dotVelocity = 0;
-    }
-
-    dot.style.top = `${dotY}px`;
-
-    // Move and manage pipes
-    if (frame % 90 === 0) {
-        createPipe();
-    }
-
-    for (let i = 0; i < pipes.length; i++) {
-        pipes[i].x -= 2;
-        pipes[i].topPipe.style.left = `${pipes[i].x}px`;
-        pipes[i].bottomPipe.style.left = `${pipes[i].x}px`;
-
-        if (pipes[i].x < -50) {
-            gameContainer.removeChild(pipes[i].topPipe);
-            gameContainer.removeChild(pipes[i].bottomPipe);
-            pipes.splice(i, 1);
-            i--;
+            pipes.push({ topPipe, bottomPipe, x: 800 });
         }
 
-        // Check for collisions
-        const dotRect = dot.getBoundingClientRect();
-        const topPipeRect = pipes[i].topPipe.getBoundingClientRect();
-        const bottomPipeRect = pipes[i].bottomPipe.getBoundingClientRect();
+        function update() {
+            frame++;
 
-        if (
-            dotRect.left < topPipeRect.left + topPipeRect.width &&
-            dotRect.left + dotRect.width > topPipeRect.left &&
-            (dotRect.top < topPipeRect.top + topPipeRect.height ||
-                dotRect.top + dotRect.height > bottomPipeRect.top)
-        ) {
-            alert('Game Over!');
-            location.reload();
+            // Move the dot
+            dotVelocity += gravity;
+            dotY += dotVelocity;
+
+            if (dotY > gameContainer.clientHeight - 20) {
+                dotY = gameContainer.clientHeight - 20;
+                dotVelocity = 0;
+            } else if (dotY < 0) {
+                dotY = 0;
+                dotVelocity = 0;
+            }
+
+            dot.style.top = `${dotY}px`;
+
+            // Move and manage pipes
+            if (frame % 90 === 0) {
+                createPipe();
+            }
+
+            for (let i = 0; i < pipes.length; i++) {
+                pipes[i].x -= 2;
+                pipes[i].topPipe.style.left = `${pipes[i].x}px`;
+                pipes[i].bottomPipe.style.left = `${pipes[i].x}px`;
+
+                if (pipes[i].x < -50) {
+                    gameContainer.removeChild(pipes[i].topPipe);
+                    gameContainer.removeChild(pipes[i].bottomPipe);
+                    pipes.splice(i, 1);
+                    i--;
+                }
+
+                // Check for collisions
+                const dotRect = dot.getBoundingClientRect();
+                const topPipeRect = pipes[i].topPipe.getBoundingClientRect();
+                const bottomPipeRect = pipes[i].bottomPipe.getBoundingClientRect();
+
+                if (
+                    dotRect.left < topPipeRect.left + topPipeRect.width &&
+                    dotRect.left + dotRect.width > topPipeRect.left &&
+                    (dotRect.top < topPipeRect.top + topPipeRect.height ||
+                        dotRect.top + dotRect.height > bottomPipeRect.top)
+                ) {
+                    alert('Game Over!');
+                    location.reload();
+                }
+            }
+
+            requestAnimationFrame(update);
         }
-    }
 
-    requestAnimationFrame(update);
-}
-
-update();
+        update();
+    </script>
+</body>
+</html>
