@@ -5,15 +5,19 @@ let dotVelocity = 0;
 const gravity = 0.6;
 const lift = -15;
 
+let gameOver = false;
+
 document.addEventListener('keydown', (e) => {
-    if (e.code === 'Space') {
+    if (e.code === 'Space' && !gameOver) {
         dotVelocity = lift;
     }
 });
 
 // Add touch event listener
 document.addEventListener('touchstart', () => {
-    dotVelocity = lift;
+    if (!gameOver) {
+        dotVelocity = lift;
+    }
 });
 
 let pipes = [];
@@ -42,6 +46,8 @@ function createPipe() {
 }
 
 function update() {
+    if (gameOver) return;
+
     frame++;
 
     // Move the dot
@@ -86,8 +92,10 @@ function update() {
             (dotRect.top < topPipeRect.top + topPipeRect.height ||
                 dotRect.top + dotRect.height > bottomPipeRect.top)
         ) {
+            gameOver = true;
             alert('Game Over!');
             location.reload();
+            break;
         }
     }
 
